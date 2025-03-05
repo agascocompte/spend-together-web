@@ -1,21 +1,20 @@
 import React from "react";
-import { useAuth } from "../context/AuthContext"; // Hook o contexto de autenticación
+import { useAuth } from "../context/AuthContext";
 
 const LoginPage: React.FC = () => {
-  const { signInWithGoogle } = useAuth(); // Función que realizará el login
+  const { signInWithGoogle } = useAuth();
 
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
-      // Aquí podrías mostrar un mensaje de error en la UI
+      alert("Error al iniciar sesión: " + error);
     }
   };
 
   return (
     <div className="h-screen flex flex-row">
-      {/* Columna izquierda */}
       <div className="flex-2 flex flex-col items-center justify-center text-white p-8 bg-gradient-to-br from-purple-700 to-purple-500">
         <img src="icon_white.svg" alt="Logo" className="w-96 h-96 mb-8" />
         <h1 className="text-5xl font-bold mb-4">Spend Together</h1>
@@ -24,7 +23,6 @@ const LoginPage: React.FC = () => {
         </p>
       </div>
 
-      {/* Columna derecha */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="bg-white p-8 max-w-md w-full">
           <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
