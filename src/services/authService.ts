@@ -1,13 +1,11 @@
-// src/services/authService.ts
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
-import firebaseApp from "../firebase"; // Configuración de Firebase
+import firebaseApp from "../firebase"; 
 
 const auth = getAuth(firebaseApp);
 const provider = new GoogleAuthProvider();
 
 export const signInWithGoogle = async () => {
   const result = await signInWithPopup(auth, provider);
-  // Aquí puedes extraer y formatear la información del usuario según necesites
   console.log(result.user);
   return result.user;
 };

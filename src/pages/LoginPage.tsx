@@ -1,12 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const LoginPage: React.FC = () => {
   const { signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
 
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
+      navigate("/home");
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       alert("Error al iniciar sesión: " + error);
