@@ -1,3 +1,4 @@
+// src/pages/HomePage.tsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -7,6 +8,7 @@ import Expenses from "../components/Expenses";
 import Categories from "../components/Categories";
 import Summary from "../components/Summary";
 import { useHousehold } from "../context/HouseholdContext";
+import { CategoriesProvider } from "../context/CategoriesContext";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -24,7 +26,9 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     if (user && !householdId) {
-      fetchHousehold(user.uid);
+      fetchHousehold(user.uid).then(() => {
+        console.log("Household cargado");
+      });
     }
   }, [user, householdId, fetchHousehold]);
 
@@ -60,42 +64,49 @@ const HomePage: React.FC = () => {
         </div>
       </header>
 
-      <main className="p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <DashboardCard
-            title="Añadir Gasto"
-            description="Registra un nuevo gasto para llevar el control."
-            section="add-expense"
-            activeSection={activeSection}
-            setActiveSection={setActiveSection}
-          />
-          <DashboardCard
-            title="Gestionar Gastos"
-            description="Visualiza, edita y elimina tus gastos."
-            section="expenses"
-            activeSection={activeSection}
-            setActiveSection={setActiveSection}
-          />
-          <DashboardCard
-            title="Gestionar Categorías"
-            description="Añade o modifica las categorías de tus gastos."
-            section="categories"
-            activeSection={activeSection}
-            setActiveSection={setActiveSection}
-          />
-          <DashboardCard
-            title="Ver Resumen"
-            description="Consulta gráficos y estadísticas de tus gastos."
-            section="summary"
-            activeSection={activeSection}
-            setActiveSection={setActiveSection}
-          />
-        </div>
+      {/* Solo cargamos el provider si householdId está disponible */}
+      {householdId ? (
+        <CategoriesProvider householdId={householdId}>
+          <main className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <DashboardCard
+                title="Añadir Gasto"
+                description="Registra un nuevo gasto para llevar el control."
+                section="add-expense"
+                activeSection={activeSection}
+                setActiveSection={setActiveSection}
+              />
+              <DashboardCard
+                title="Gestionar Gastos"
+                description="Visualiza, edita y elimina tus gastos."
+                section="expenses"
+                activeSection={activeSection}
+                setActiveSection={setActiveSection}
+              />
+              <DashboardCard
+                title="Gestionar Categorías"
+                description="Añade o modifica las categorías de tus gastos."
+                section="categories"
+                activeSection={activeSection}
+                setActiveSection={setActiveSection}
+              />
+              <DashboardCard
+                title="Ver Resumen"
+                description="Consulta gráficos y estadísticas de tus gastos."
+                section="summary"
+                activeSection={activeSection}
+                setActiveSection={setActiveSection}
+              />
+            </div>
 
-        <div className="mt-8 bg-white p-6 rounded-lg shadow">
-          {renderActiveSection()}
-        </div>
-      </main>
+            <div className="mt-8 bg-white p-6 rounded-lg shadow">
+              {renderActiveSection()}
+            </div>
+          </main>
+        </CategoriesProvider>
+      ) : (
+        <p className="p-8">Cargando información del grupo...</p>
+      )}
     </div>
   );
 };

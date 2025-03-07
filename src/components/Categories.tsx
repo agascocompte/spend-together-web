@@ -1,18 +1,19 @@
-import { useEffect } from "react";
-import useCategories from "../hooks/useCategories";
-import { useHousehold } from "../context/HouseholdContext";
+import React from "react";
+import { useCategoriesContext } from "../context/CategoriesContext";
 
 const Categories: React.FC = () => {
-  const { householdId } = useHousehold();
-  const { categories, error } = useCategories(householdId ?? "");
+  const { categories, error } = useCategoriesContext();
 
-  useEffect(() => {
-    console.log("Categorías:", categories);
-  }, [categories]);
+  if (error) return <p>Error: {error.message}</p>;
+
   return (
     <div>
       <h3 className="text-xl font-bold">Gestionar Categorías</h3>
-      <p>Lista de categorías...</p>
+      {categories.map((cat) => (
+        <div key={cat.id} className="border p-2 my-1">
+          {cat.name}
+        </div>
+      ))}
     </div>
   );
 };
