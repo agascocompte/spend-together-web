@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import DashboardCard from "../components/DashboardCard";
@@ -6,10 +6,12 @@ import AddExpense from "../components/AddExpense";
 import Expenses from "../components/Expenses";
 import Categories from "../components/Categories";
 import Summary from "../components/Summary";
+import { useHousehold } from "../context/HouseholdContext";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { user, signOutUser } = useAuth();
+  const { householdId, fetchHousehold } = useHousehold();
 
   const handleLogout = async () => {
     try {
@@ -19,6 +21,12 @@ const HomePage: React.FC = () => {
       console.error("Error al cerrar sesión:", error);
     }
   };
+
+  useEffect(() => {
+    if (user && !householdId) {
+      fetchHousehold(user.uid);
+    }
+  }, [user, householdId, fetchHousehold]);
 
   const [activeSection, setActiveSection] = useState<string>("add-expense");
 
