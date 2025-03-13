@@ -44,6 +44,10 @@ export const CategoriesProvider = ({
           id: doc.id,
           ...doc.data(),
         })) as Category[];
+        cats.forEach((cat) => {
+          if (cat.color.length == 8)
+            cat.color = "#" + cat.color.slice(2, cat.color.length);
+        });
         setCategories(cats);
       },
       (err) => setError(err)
