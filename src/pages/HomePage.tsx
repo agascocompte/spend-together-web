@@ -53,7 +53,7 @@ const HomePage: React.FC = () => {
         <div className="flex items-center space-x-4">
           <p>{user?.email}</p>
           <button
-            className="text-gray-600 hover:text-gray-800 transition-colors"
+            className="text-gray-600 hover:text-gray-800 transition-colors cursor-pointer"
             onClick={handleLogout}
           >
             Logout
