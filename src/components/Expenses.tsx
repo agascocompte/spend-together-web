@@ -168,7 +168,7 @@ const Expenses: React.FC = () => {
         <h3 className="text-xl font-bold">Gastos</h3>
         <button
           onClick={() => setShowModal(true)}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600"
         >
           + Añadir Gasto
         </button>
