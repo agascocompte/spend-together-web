@@ -34,14 +34,12 @@ const Expenses: React.FC = () => {
 
   const formatDate = (date: any) => {
     const parsed = isTimestamp(date) ? date.toDate() : new Date(date);
-
     const formatted = new Intl.DateTimeFormat("es-ES", {
       weekday: "long",
       day: "2-digit",
       month: "long",
       year: "numeric",
     }).format(parsed);
-
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   };
 
@@ -73,11 +71,9 @@ const Expenses: React.FC = () => {
         const startOfWeek = new Date(now);
         startOfWeek.setDate(now.getDate() - diffToMonday);
         startOfWeek.setHours(0, 0, 0, 0);
-
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(startOfWeek.getDate() + 6);
         endOfWeek.setHours(23, 59, 59, 999);
-
         return date >= startOfWeek && date <= endOfWeek;
       }
       case "month":
@@ -100,7 +96,6 @@ const Expenses: React.FC = () => {
   const sortExpenses = (a: Expense, b: Expense) => {
     const getDate = (d: any): Date =>
       isTimestamp(d) ? d.toDate() : new Date(d);
-
     switch (filters.sortBy) {
       case "date_asc":
         return getDate(a.date).getTime() - getDate(b.date).getTime();
@@ -121,12 +116,51 @@ const Expenses: React.FC = () => {
 
   const visibleExpenses = expenses.filter(filterByDate).sort(sortExpenses);
 
+  const groupExpenses = (expenses: Expense[]) => {
+    const grouped: Record<string, Expense[]> = {};
+
+    for (const expense of expenses) {
+      const date = isTimestamp(expense.date)
+        ? expense.date.toDate()
+        : new Date(expense.date);
+
+      let key = "";
+      switch (filters.period) {
+        case "week":
+          key = new Intl.DateTimeFormat("es-ES", {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+          }).format(date);
+          break;
+        case "month":
+          const monday = new Date(date);
+          const diff = (monday.getDay() + 6) % 7;
+          monday.setDate(date.getDate() - diff);
+          key = `Semana del ${monday.toLocaleDateString("es-ES")}`;
+          break;
+        case "year":
+          key = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(
+            date
+          );
+          break;
+        default:
+          key = "";
+      }
+
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(expense);
+    }
+
+    return grouped;
+  };
+
+  const groupedExpenses = groupExpenses(visibleExpenses);
+
   const handleEdit = (expense: Expense) => {
     setEditingExpense(expense);
     setShowModal(true);
   };
-
-  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div>
@@ -134,7 +168,7 @@ const Expenses: React.FC = () => {
         <h3 className="text-xl font-bold">Gastos</h3>
         <button
           onClick={() => setShowModal(true)}
-          className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600 transition-colors"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           + Añadir Gasto
         </button>
@@ -142,63 +176,94 @@ const Expenses: React.FC = () => {
 
       <ExpenseFilters onFilterChange={setFilters} />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {visibleExpenses.map((expense) => (
-          <div
-            key={expense.id}
-            className="relative group border-2 rounded-sm p-4 my-1 text-white transition-all overflow-hidden flex flex-col justify-between"
-            style={getCategoryStyle(expense.categoryId)}
-          >
-            <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-sm pointer-events-none" />
+      {Object.entries(groupedExpenses).map(
+        ([sectionTitle, expensesInGroup]) => {
+          const totalAmount = expensesInGroup.reduce(
+            (sum, exp) => sum + exp.amount,
+            0
+          );
 
-            <div className="relative z-10 flex justify-between items-start mb-2">
-              <div className="flex items-center gap-2">
-                {React.cloneElement(
-                  getIconForCategory(
-                    categories.find((c) => c.id === expense.categoryId)?.icon ??
-                      "default"
-                  ),
-                  { style: { fontSize: 24, color: "white" } }
-                )}
-                <span className="font-semibold text-lg">
-                  {getCategoryName(expense.categoryId)}
+          return (
+            <div key={sectionTitle}>
+              {/* Separador */}
+              <div className="flex items-center my-6">
+                <div className="flex-grow border-t border-gray-300 opacity-40"></div>
+                <span className="px-4 py-1 text-sm font-semibold text-gray-700 bg-white rounded shadow mx-2">
+                  {sectionTitle}
                 </span>
+                <div className="flex-grow border-t border-gray-300 opacity-40"></div>
+              </div>
+
+              {/* Gastos del grupo */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {expensesInGroup.map((expense) => (
+                  <div
+                    key={expense.id}
+                    className="relative group border-2 rounded-sm p-4 my-1 text-white transition-all overflow-hidden flex flex-col justify-between"
+                    style={getCategoryStyle(expense.categoryId)}
+                  >
+                    <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-sm pointer-events-none" />
+
+                    <div className="relative z-10 flex justify-between items-start mb-2">
+                      <div className="flex items-center gap-2">
+                        {React.cloneElement(
+                          getIconForCategory(
+                            categories.find((c) => c.id === expense.categoryId)
+                              ?.icon ?? "default"
+                          ),
+                          { style: { fontSize: 24, color: "white" } }
+                        )}
+                        <span className="font-semibold text-lg">
+                          {getCategoryName(expense.categoryId)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-sm mb-1">
+                      {formatDate(expense.date)}
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm italic">
+                        {expense.description || (
+                          <span className="opacity-50">Sin descripción</span>
+                        )}
+                      </div>
+                      <div className="text-2xl font-bold whitespace-nowrap ml-4">
+                        €{expense.amount.toFixed(2)}
+                      </div>
+                    </div>
+
+                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                      <button
+                        title="Editar"
+                        className="w-8 h-8 bg-white text-gray-800 flex items-center justify-center rounded-md shadow hover:scale-105 hover:bg-gray-100 transition transform cursor-pointer"
+                        onClick={() => handleEdit(expense)}
+                      >
+                        <EditIcon fontSize="small" />
+                      </button>
+
+                      <button
+                        title="Borrar"
+                        className="w-8 h-8 bg-red-500 text-white flex items-center justify-center rounded-md shadow hover:scale-105 hover:bg-red-600 transition transform cursor-pointer"
+                        onClick={() => setExpenseToDelete(expense)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Total del grupo */}
+              <div className="text-right text-2xl font-medium text-gray-700 mt-2 mb-4">
+                Total:{" "}
+                <span className="font-bold">€{totalAmount.toFixed(2)}</span>
               </div>
             </div>
-
-            <div className="text-sm mb-1">{formatDate(expense.date)}</div>
-
-            <div className="flex justify-between items-center">
-              <div className="text-sm italic">
-                {expense.description || (
-                  <span className="opacity-50">Sin descripción</span>
-                )}
-              </div>
-              <div className="text-2xl font-bold whitespace-nowrap ml-4">
-                €{expense.amount.toFixed(2)}
-              </div>
-            </div>
-
-            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-              <button
-                title="Editar"
-                className="w-8 h-8 bg-white text-gray-800 flex items-center justify-center rounded-md shadow hover:scale-105 hover:bg-gray-100 transition transform cursor-pointer"
-                onClick={() => handleEdit(expense)}
-              >
-                <EditIcon fontSize="small" />
-              </button>
-
-              <button
-                title="Borrar"
-                className="w-8 h-8 bg-red-500 text-white flex items-center justify-center rounded-md shadow hover:scale-105 hover:bg-red-600 transition transform cursor-pointer"
-                onClick={() => setExpenseToDelete(expense)}
-              >
-                <DeleteIcon fontSize="small" />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          );
+        }
+      )}
 
       {showModal && householdId && (
         <AddExpenseModal
