@@ -12,7 +12,7 @@ import ExpenseFilters, { PeriodFilter, SortOption } from "./ExpenseFilters";
 
 const Expenses: React.FC = () => {
   const { householdId } = useHousehold();
-  const { expenses, error } = useExpensesContext();
+  const { expenses } = useExpensesContext();
   const { categories } = useCategoriesContext();
 
   const [showModal, setShowModal] = useState(false);
@@ -256,9 +256,10 @@ const Expenses: React.FC = () => {
               </div>
 
               {/* Total del grupo */}
-              <div className="text-right text-2xl font-medium text-gray-700 mt-2 mb-4">
-                Total:{" "}
-                <span className="font-bold">€{totalAmount.toFixed(2)}</span>
+              <div className="flex justify-center mt-4 mb-4">
+                <div className="bg-gray-100 px-6 py-2 rounded-full shadow text-gray-800 text-2xl font-semibold">
+                  Total: €{totalAmount.toFixed(2)}
+                </div>
               </div>
             </div>
           );
