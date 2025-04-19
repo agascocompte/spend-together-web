@@ -1,13 +1,38 @@
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { useCategoriesContext } from "../context/CategoriesContext";
+import { deleteCategory } from "../services/categoryService";
 import { darkenColor, getIconForCategory } from "../utils";
 import AddCategoryModal from "./AddCategoryModal";
 import { useHousehold } from "../context/HouseholdContext";
+import { Category } from "../models/Category";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Categories: React.FC = () => {
   const { categories, error } = useCategoriesContext();
   const { householdId } = useHousehold();
   const [showModal, setShowModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+
+  const handleEdit = (category: Category) => {
+    setEditingCategory(category);
+    setShowModal(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    const confirm = window.confirm(
+      "¿Estás seguro de que quieres eliminar esta categoría?"
+    );
+    if (!confirm) return;
+
+    try {
+      await deleteCategory(id);
+      toast.success("Categoría eliminada");
+    } catch (err) {
+      toast.error("Error al eliminar la categoría");
+    }
+  };
 
   if (error) return <p>Error: {error.message}</p>;
 
@@ -25,12 +50,15 @@ const Categories: React.FC = () => {
         {categories.map((cat) => (
           <div
             key={cat.id}
-            className="border-2 rounded-sm p-2 my-1 text-white text-center"
+            className="relative group border-2 rounded-sm p-2 my-1 text-white text-center transition-all"
             style={{
               backgroundColor: cat.color,
               borderColor: darkenColor(cat.color, 5),
             }}
           >
+            <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 rounded-sm transition-opacity pointer-events-none" />
+
+            {/* Icono */}
             <div>
               {React.cloneElement(getIconForCategory(cat.icon), {
                 className: "mx-auto",
@@ -38,6 +66,25 @@ const Categories: React.FC = () => {
               })}
             </div>
             <h1 className="text-lg font-bold">{cat.name}</h1>
+
+            {/* Botones flotantes */}
+            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                title="Editar"
+                className="w-8 h-8 bg-white text-gray-800 flex items-center justify-center rounded-md shadow hover:scale-105 hover:bg-gray-100 transition transform cursor-pointer"
+                onClick={() => handleEdit(cat)}
+              >
+                <EditIcon fontSize="small" />
+              </button>
+
+              <button
+                title="Borrar"
+                className="w-8 h-8 bg-red-500 text-white flex items-center justify-center rounded-md shadow hover:scale-105 hover:bg-red-600 transition transform cursor-pointer"
+                onClick={() => handleDelete(cat.id)}
+              >
+                <DeleteIcon fontSize="small" />
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -45,7 +92,11 @@ const Categories: React.FC = () => {
       {showModal && householdId && (
         <AddCategoryModal
           householdId={householdId}
-          onClose={() => setShowModal(false)}
+          onClose={() => {
+            setShowModal(false);
+            setEditingCategory(null);
+          }}
+          editingCategory={editingCategory}
         />
       )}
     </div>

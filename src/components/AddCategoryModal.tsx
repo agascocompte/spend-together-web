@@ -1,32 +1,51 @@
 import toast from "react-hot-toast";
 import React, { useState } from "react";
-import { addCategory } from "../services/categoryService";
+import { addCategory, updateCategory } from "../services/categoryService";
 import { CATEGORY_ICON_OPTIONS } from "../utils";
 import { useAuth } from "../context/AuthContext";
+import { Category } from "../models/Category";
 
 interface Props {
   householdId: string;
   onClose: () => void;
+  editingCategory?: Category | null;
 }
 
-const AddCategoryModal: React.FC<Props> = ({ householdId, onClose }) => {
+const AddCategoryModal: React.FC<Props> = ({
+  householdId,
+  onClose,
+  editingCategory,
+}) => {
   const { user } = useAuth();
-  const [name, setName] = useState("");
-  const [color, setColor] = useState("#4F46E5"); // color por defecto
-  const [icon, setIcon] = useState("FaShoppingCart");
+  const [name, setName] = useState(editingCategory?.name || "");
+  const [color, setColor] = useState(editingCategory?.color || "#4F46E5");
+  const [icon, setIcon] = useState(editingCategory?.icon || "shopping_cart");
 
   const handleSubmit = async () => {
     if (!user) return;
 
-    await addCategory({
-      name,
-      color,
-      icon,
-      householdId,
-    });
-
-    toast.success("¡Categoría añadida con éxito!");
-    onClose();
+    try {
+      if (editingCategory) {
+        await updateCategory({
+          ...editingCategory,
+          name,
+          color,
+          icon,
+        });
+        toast.success("Categoría actualizada");
+      } else {
+        await addCategory({
+          name,
+          color,
+          icon,
+          householdId,
+        });
+        toast.success("¡Categoría añadida con éxito!");
+      }
+      onClose();
+    } catch (err) {
+      toast.error("Error al guardar la categoría");
+    }
   };
 
   const selectedIcon =

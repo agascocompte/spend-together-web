@@ -1,4 +1,3 @@
-// src/context/CategoriesContext.tsx
 import {
   createContext,
   useContext,
