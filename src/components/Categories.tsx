@@ -1,37 +1,29 @@
 import React, { useState } from "react";
-import toast from "react-hot-toast";
 import { useCategoriesContext } from "../context/CategoriesContext";
-import { deleteCategory } from "../services/categoryService";
 import { darkenColor, getIconForCategory } from "../utils";
 import AddCategoryModal from "./AddCategoryModal";
 import { useHousehold } from "../context/HouseholdContext";
 import { Category } from "../models/Category";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteCategoryModal from "./DeleteCategoryModal";
 
 const Categories: React.FC = () => {
   const { categories, error } = useCategoriesContext();
   const { householdId } = useHousehold();
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(
+    null
+  );
 
   const handleEdit = (category: Category) => {
     setEditingCategory(category);
     setShowModal(true);
   };
 
-  const handleDelete = async (id: string) => {
-    const confirm = window.confirm(
-      "¿Estás seguro de que quieres eliminar esta categoría?"
-    );
-    if (!confirm) return;
-
-    try {
-      await deleteCategory(id);
-      toast.success("Categoría eliminada");
-    } catch (err) {
-      toast.error("Error al eliminar la categoría");
-    }
+  const handleDeleteClick = (cat: Category) => {
+    setCategoryToDelete(cat);
   };
 
   if (error) return <p>Error: {error.message}</p>;
@@ -80,7 +72,7 @@ const Categories: React.FC = () => {
               <button
                 title="Borrar"
                 className="w-8 h-8 bg-red-500 text-white flex items-center justify-center rounded-md shadow hover:scale-105 hover:bg-red-600 transition transform cursor-pointer"
-                onClick={() => handleDelete(cat.id)}
+                onClick={() => handleDeleteClick(cat)}
               >
                 <DeleteIcon fontSize="small" />
               </button>
@@ -97,6 +89,13 @@ const Categories: React.FC = () => {
             setEditingCategory(null);
           }}
           editingCategory={editingCategory}
+        />
+      )}
+
+      {categoryToDelete && (
+        <DeleteCategoryModal
+          category={categoryToDelete}
+          onClose={() => setCategoryToDelete(null)}
         />
       )}
     </div>
