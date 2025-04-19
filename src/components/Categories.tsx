@@ -30,13 +30,15 @@ const Categories: React.FC = () => {
 
   return (
     <div>
-      <h3 className="text-xl font-bold mb-4">Gestionar Categorías</h3>
-      <button
-        onClick={() => setShowModal(true)}
-        className="mb-4 px-4 py-2 bg-green-500 text-white rounded cursor-pointer hover:bg-green-600 transition-colors"
-      >
-        + Añadir Categoría
-      </button>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-bold">Categorías</h3>
+        <button
+          onClick={() => setShowModal(true)}
+          className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600 transition-colors"
+        >
+          + Añadir Categoría
+        </button>
+      </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {categories.map((cat) => (
