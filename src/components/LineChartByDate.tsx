@@ -11,6 +11,7 @@ import {
 import { Expense } from "../models/Expense";
 import { PeriodFilter } from "../utils/expenseFilters";
 import { isTimestamp } from "../utils/expenseFilters";
+import { capitalize } from "../utils/format";
 
 interface LineChartByDateProps {
   expenses: Expense[];
@@ -40,7 +41,7 @@ const LineChartByDate: React.FC<LineChartByDateProps> = ({
     const date = isTimestamp(expense.date)
       ? expense.date.toDate()
       : new Date(expense.date);
-    const key = formatKey(date, period);
+    const key = capitalize(formatKey(date, period));
 
     if (!grouped[key]) {
       grouped[key] = { total: 0, date };
@@ -59,7 +60,9 @@ const LineChartByDate: React.FC<LineChartByDateProps> = ({
         <LineChart data={data}>
           <XAxis dataKey="label" />
           <YAxis />
-          <Tooltip formatter={(value) => [`${value} €`, "Total"]} />
+          <Tooltip
+            formatter={(value: number) => [`${value.toFixed(2)}€`, "Total"]}
+          />
           <Line
             type="monotone"
             dataKey="total"

@@ -10,6 +10,7 @@ import {
 import { Expense } from "../models/Expense";
 import { PeriodFilter } from "./ExpenseFilters";
 import { isTimestamp } from "../utils/expenseFilters";
+import { capitalize } from "../utils/format";
 
 interface BarChartByDateProps {
   expenses: Expense[];
@@ -35,7 +36,7 @@ const getLabelForDate = (date: Date, period: PeriodFilter): string => {
       weekStart.setDate(weekStart.getDate() - diff);
       return `Semana del ${weekStart.toLocaleDateString("es-ES", options)}`;
     case "year":
-      return date.toLocaleDateString("es-ES", { month: "long" });
+      return capitalize(date.toLocaleDateString("es-ES", { month: "long" }));
     default:
       return date.toLocaleDateString("es-ES", options);
   }
@@ -57,7 +58,7 @@ const BarChartByDate: React.FC<BarChartByDateProps> = ({
   }
 
   const data = Object.entries(dataMap).map(([label, total]) => ({
-    name: label,
+    name: capitalize(label),
     total,
   }));
 
@@ -69,7 +70,9 @@ const BarChartByDate: React.FC<BarChartByDateProps> = ({
         <BarChart data={data}>
           <XAxis dataKey="name" />
           <YAxis />
-          <Tooltip formatter={(value: number) => `${value.toFixed(2)} €`} />
+          <Tooltip
+            formatter={(value: number) => [`${value.toFixed(2)}€`, "Total"]}
+          />{" "}
           <Bar dataKey="total" fill="#8884d8" />
         </BarChart>
       </ResponsiveContainer>
