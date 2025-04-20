@@ -4,6 +4,7 @@ import { useCategoriesContext } from "../context/CategoriesContext";
 import { useExpensesContext } from "../context/ExpensesContent";
 import ExpenseFilters, { PeriodFilter, SortOption } from "./ExpenseFilters";
 import { sortExpenses, filterExpensesByDate } from "../utils/expenseFilters";
+import PieChartByCategory from "./PieChartByCategory";
 
 const Summary: React.FC = () => {
   const { expenses } = useExpensesContext();
@@ -39,8 +40,6 @@ const Summary: React.FC = () => {
       (dataMap[expense.categoryId] ?? 0) + expense.amount;
   }
 
-  const total = Object.values(dataMap).reduce((sum, value) => sum + value, 0);
-
   const pieData = Object.entries(dataMap).map(([categoryId, value]) => {
     const category = categories.find((c) => c.id === categoryId);
     return {
@@ -58,58 +57,7 @@ const Summary: React.FC = () => {
       {pieData.length === 0 ? (
         <p className="mt-6">No hay datos para mostrar.</p>
       ) : (
-        <>
-          <div className="flex flex-col lg:flex-row gap-10 mt-8">
-            {/* Pie chart */}
-            <div className="flex justify-center w-full lg:w-1/2">
-              <PieChart width={650} height={400}>
-                <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={130}
-                  label={({ name, percent }) =>
-                    `${name} ${(percent * 100).toFixed(1)}%`
-                  }
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={entry.color}
-                      stroke="#ffffff"
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </div>
-
-            {/* Leyenda al lado */}
-            <div className="w-full lg:w-1/2 max-h-[400px] overflow-y-auto pr-4">
-              {pieData.map((entry, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center mb-2 px-4 py-2 rounded"
-                  style={{ backgroundColor: entry.color, color: "white" }}
-                >
-                  <span className="font-semibold">{entry.name}</span>
-                  <span className="text-xl font-bold">
-                    {entry.value.toFixed(2)} €
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Total global centrado debajo */}
-          <div className="mt-10 text-center">
-            <div className="inline-block bg-gray-100 rounded-full px-6 py-3 text-2xl font-bold text-gray-800 shadow">
-              Total: {total.toFixed(2)} €
-            </div>
-          </div>
-        </>
+        <PieChartByCategory data={pieData} />
       )}
     </div>
   );
