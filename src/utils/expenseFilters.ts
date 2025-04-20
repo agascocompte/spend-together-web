@@ -59,6 +59,17 @@ export function filterByDate(
   }
 }
 
+export function filterExpensesByDate(
+  expenses: Expense[],
+  period: PeriodFilter,
+  startDate?: string,
+  endDate?: string
+): Expense[] {
+  return expenses.filter((expense) =>
+    filterByDate(expense, period, startDate, endDate)
+  );
+}
+
 export function sortExpenses(
   a: Expense,
   b: Expense,

@@ -55,6 +55,8 @@ const Expenses: React.FC = () => {
 
   const groupedExpenses = groupExpenses(visibleExpenses, filters.period);
 
+  const totalGeneral = visibleExpenses.reduce((sum, e) => sum + e.amount, 0);
+
   const handleEdit = (expense: Expense) => {
     setEditingExpense(expense);
     setShowModal(true);
@@ -72,7 +74,12 @@ const Expenses: React.FC = () => {
         </button>
       </div>
 
-      <ExpenseFilters onFilterChange={setFilters} />
+      <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
+        <ExpenseFilters onFilterChange={setFilters} />
+        <div className="bg-gray-100 rounded-full px-6 py-2 text-lg font-bold text-gray-800 shadow whitespace-nowrap">
+          Total general: {totalGeneral.toFixed(2)}€
+        </div>
+      </div>
 
       {Object.entries(groupedExpenses).map(
         ([sectionTitle, expensesInGroup]) => {
@@ -156,7 +163,7 @@ const Expenses: React.FC = () => {
               {/* Total del grupo */}
               <div className="flex justify-center mt-4 mb-4">
                 <div className="bg-gray-100 px-6 py-2 rounded-full shadow text-gray-800 text-2xl font-semibold">
-                  Total: €{totalAmount.toFixed(2)}
+                  Total: {totalAmount.toFixed(2)}€
                 </div>
               </div>
             </div>
