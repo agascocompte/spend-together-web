@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import { useCategoriesContext } from "../context/CategoriesContext";
 import { useExpensesContext } from "../context/ExpensesContent";
 import ExpenseFilters, { PeriodFilter, SortOption } from "./ExpenseFilters";
 import { sortExpenses, filterExpensesByDate } from "../utils/expenseFilters";
 import PieChartByCategory from "./PieChartByCategory";
+import BarChartByDate from "./BarChartByDate";
+import LineChartByDate from "./LineChartByDate";
 
 const Summary: React.FC = () => {
   const { expenses } = useExpensesContext();
@@ -49,15 +50,33 @@ const Summary: React.FC = () => {
     };
   });
 
+  const totalGeneral = pieData.reduce((sum, entry) => sum + entry.value, 0);
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Resumen</h2>
-      <ExpenseFilters onFilterChange={setFilters} />
+      <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
+        <ExpenseFilters onFilterChange={setFilters} />
+        <div className="bg-gray-100 rounded-full px-6 py-2 text-lg font-bold text-gray-800 shadow whitespace-nowrap">
+          Total general: {totalGeneral.toFixed(2)}€
+        </div>
+      </div>
 
       {pieData.length === 0 ? (
         <p className="mt-6">No hay datos para mostrar.</p>
       ) : (
-        <PieChartByCategory data={pieData} />
+        <>
+          <PieChartByCategory data={pieData} />
+
+          <BarChartByDate
+            expenses={sorted}
+            period={filters.period}
+            startDate={filters.startDate}
+            endDate={filters.endDate}
+          />
+
+          <LineChartByDate expenses={filtered} period={filters.period} />
+        </>
       )}
     </div>
   );

@@ -10,10 +10,10 @@ interface PieChartByCategoryProps {
 }
 
 const PieChartByCategory: React.FC<PieChartByCategoryProps> = ({ data }) => {
-  const total = data.reduce((sum, entry) => sum + entry.value, 0);
-
   return (
     <>
+      <h3 className="text-lg font-semibold mb-4">Gastos por categoría</h3>
+
       <div className="flex flex-col lg:flex-row gap-10 mt-8">
         {/* Pie chart */}
         <div className="flex justify-center w-full lg:w-1/2">
@@ -55,13 +55,6 @@ const PieChartByCategory: React.FC<PieChartByCategoryProps> = ({ data }) => {
               </span>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Total debajo */}
-      <div className="mt-10 text-center">
-        <div className="inline-block bg-gray-100 rounded-full px-6 py-3 text-2xl font-bold text-gray-800 shadow">
-          Total: {total.toFixed(2)} €
         </div>
       </div>
     </>
