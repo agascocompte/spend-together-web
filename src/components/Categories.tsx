@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useCategoriesContext } from "../context/CategoriesContext";
-import { darkenColor, getIconForCategory } from "../utils";
 import AddCategoryModal from "./AddCategoryModal";
 import { useHousehold } from "../context/HouseholdContext";
 import { Category } from "../models/Category";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteCategoryModal from "./DeleteCategoryModal";
+import { darkenColor } from "../utils/colors";
+import { getIconForCategory } from "../utils/icons";
 
 const Categories: React.FC = () => {
   const { categories, error } = useCategoriesContext();

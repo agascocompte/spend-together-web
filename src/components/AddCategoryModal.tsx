@@ -1,9 +1,9 @@
 import toast from "react-hot-toast";
 import React, { useState } from "react";
 import { addCategory, updateCategory } from "../services/categoryService";
-import { CATEGORY_ICON_OPTIONS } from "../utils";
 import { useAuth } from "../context/AuthContext";
 import { Category } from "../models/Category";
+import { CATEGORY_ICON_OPTIONS } from "../utils/icons";
 
 interface Props {
   householdId: string;

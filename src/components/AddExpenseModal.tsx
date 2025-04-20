@@ -6,7 +6,8 @@ import toast from "react-hot-toast";
 import { Expense } from "../models/Expense";
 import { Listbox } from "@headlessui/react";
 import { ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { darkenColor, getIconForCategory } from "../utils";
+import { darkenColor } from "../utils/colors";
+import { getIconForCategory } from "../utils/icons";
 
 interface Props {
   householdId: string;

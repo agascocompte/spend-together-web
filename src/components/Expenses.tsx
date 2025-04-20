@@ -4,11 +4,17 @@ import { useCategoriesContext } from "../context/CategoriesContext";
 import { useExpensesContext } from "../context/ExpensesContent";
 import AddExpenseModal from "./AddExpenseModal";
 import DeleteExpenseModal from "./DeleteExpenseModal";
-import { getIconForCategory } from "../utils";
 import { Expense } from "../models/Expense";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ExpenseFilters, { PeriodFilter, SortOption } from "./ExpenseFilters";
+import { getIconForCategory } from "../utils/icons";
+import {
+  filterByDate,
+  formatDate,
+  groupExpenses,
+  sortExpenses,
+} from "../utils/expenseFilters";
 
 const Expenses: React.FC = () => {
   const { householdId } = useHousehold();
@@ -28,21 +34,6 @@ const Expenses: React.FC = () => {
     sortBy: "date_desc",
   });
 
-  function isTimestamp(obj: any): obj is { toDate: () => Date } {
-    return obj && typeof obj.toDate === "function";
-  }
-
-  const formatDate = (date: any) => {
-    const parsed = isTimestamp(date) ? date.toDate() : new Date(date);
-    const formatted = new Intl.DateTimeFormat("es-ES", {
-      weekday: "long",
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    }).format(parsed);
-    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
-  };
-
   const getCategoryStyle = (categoryId: string) => {
     const cat = categories.find((c) => c.id === categoryId);
     return {
@@ -56,106 +47,13 @@ const Expenses: React.FC = () => {
     return categories.find((c) => c.id === categoryId)?.name || "Sin categoría";
   };
 
-  const filterByDate = (expense: Expense) => {
-    const date = isTimestamp(expense.date)
-      ? expense.date.toDate()
-      : new Date(expense.date);
-    const now = new Date();
+  const visibleExpenses = expenses
+    .filter((e) =>
+      filterByDate(e, filters.period, filters.startDate, filters.endDate)
+    )
+    .sort((a, b) => sortExpenses(a, b, filters.sortBy, getCategoryName));
 
-    switch (filters.period) {
-      case "day":
-        return date.toDateString() === now.toDateString();
-      case "week": {
-        const dayOfWeek = now.getDay();
-        const diffToMonday = (dayOfWeek + 6) % 7;
-        const startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - diffToMonday);
-        startOfWeek.setHours(0, 0, 0, 0);
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6);
-        endOfWeek.setHours(23, 59, 59, 999);
-        return date >= startOfWeek && date <= endOfWeek;
-      }
-      case "month":
-        return (
-          date.getMonth() === now.getMonth() &&
-          date.getFullYear() === now.getFullYear()
-        );
-      case "year":
-        return date.getFullYear() === now.getFullYear();
-      case "custom":
-        if (!filters.startDate || !filters.endDate) return true;
-        const start = new Date(filters.startDate);
-        const end = new Date(filters.endDate);
-        return date >= start && date <= end;
-      default:
-        return true;
-    }
-  };
-
-  const sortExpenses = (a: Expense, b: Expense) => {
-    const getDate = (d: any): Date =>
-      isTimestamp(d) ? d.toDate() : new Date(d);
-    switch (filters.sortBy) {
-      case "date_asc":
-        return getDate(a.date).getTime() - getDate(b.date).getTime();
-      case "date_desc":
-        return getDate(b.date).getTime() - getDate(a.date).getTime();
-      case "price_asc":
-        return a.amount - b.amount;
-      case "price_desc":
-        return b.amount - a.amount;
-      case "category":
-        const nameA = getCategoryName(a.categoryId).toLowerCase();
-        const nameB = getCategoryName(b.categoryId).toLowerCase();
-        return nameA.localeCompare(nameB);
-      default:
-        return 0;
-    }
-  };
-
-  const visibleExpenses = expenses.filter(filterByDate).sort(sortExpenses);
-
-  const groupExpenses = (expenses: Expense[]) => {
-    const grouped: Record<string, Expense[]> = {};
-
-    for (const expense of expenses) {
-      const date = isTimestamp(expense.date)
-        ? expense.date.toDate()
-        : new Date(expense.date);
-
-      let key = "";
-      switch (filters.period) {
-        case "week":
-          key = new Intl.DateTimeFormat("es-ES", {
-            weekday: "long",
-            day: "2-digit",
-            month: "long",
-          }).format(date);
-          break;
-        case "month":
-          const monday = new Date(date);
-          const diff = (monday.getDay() + 6) % 7;
-          monday.setDate(date.getDate() - diff);
-          key = `Semana del ${monday.toLocaleDateString("es-ES")}`;
-          break;
-        case "year":
-          key = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(
-            date
-          );
-          break;
-        default:
-          key = "";
-      }
-
-      if (!grouped[key]) grouped[key] = [];
-      grouped[key].push(expense);
-    }
-
-    return grouped;
-  };
-
-  const groupedExpenses = groupExpenses(visibleExpenses);
+  const groupedExpenses = groupExpenses(visibleExpenses, filters.period);
 
   const handleEdit = (expense: Expense) => {
     setEditingExpense(expense);
