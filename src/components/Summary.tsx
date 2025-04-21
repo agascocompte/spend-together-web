@@ -53,30 +53,37 @@ const Summary: React.FC = () => {
   const totalGeneral = pieData.reduce((sum, entry) => sum + entry.value, 0);
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Resumen</h2>
-      <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
+    <div className="p-6 text-white">
+      <h2 className="text-2xl font-bold mb-6">Resumen</h2>
+
+      <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         <ExpenseFilters onFilterChange={setFilters} />
-        <div className="bg-gray-100 rounded-full px-6 py-2 text-lg font-bold text-gray-800 shadow whitespace-nowrap">
+        <div className="bg-white text-purple-700 rounded-full px-6 py-2 text-lg font-bold shadow whitespace-nowrap">
           Total general: {totalGeneral.toFixed(2)}€
         </div>
       </div>
 
       {pieData.length === 0 ? (
-        <p className="mt-6">No hay datos para mostrar.</p>
+        <p className="mt-6 text-white">No hay datos para mostrar.</p>
       ) : (
-        <>
-          <PieChartByCategory data={pieData} />
+        <div className="space-y-16">
+          <div className="bg-white/10 p-6 rounded-2xl shadow-md backdrop-blur-md">
+            <PieChartByCategory data={pieData} />
+          </div>
 
-          <BarChartByDate
-            expenses={sorted}
-            period={filters.period}
-            startDate={filters.startDate}
-            endDate={filters.endDate}
-          />
+          <div className="bg-white/10 p-6 rounded-2xl shadow-md backdrop-blur-md">
+            <BarChartByDate
+              expenses={sorted}
+              period={filters.period}
+              startDate={filters.startDate}
+              endDate={filters.endDate}
+            />
+          </div>
 
-          <LineChartByDate expenses={filtered} period={filters.period} />
-        </>
+          <div className="bg-white/10 p-6 rounded-2xl shadow-md backdrop-blur-md">
+            <LineChartByDate expenses={filtered} period={filters.period} />
+          </div>
+        </div>
       )}
     </div>
   );

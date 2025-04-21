@@ -17,12 +17,14 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   return (
     <div
       onClick={() => setActiveSection(section)}
-      className={`cursor-pointer bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow ${
-        isActive ? "border-2 border-blue-500" : "border border-transparent"
+      className={`cursor-pointer rounded-2xl p-6 shadow-lg transition-all transform hover:scale-[1.02] backdrop-blur-md bg-white/10 border ${
+        isActive
+          ? "border-white ring-2 ring-white"
+          : "border-transparent hover:border-white/30"
       }`}
     >
-      <h2 className="text-lg font-semibold mb-2">{title}</h2>
-      <p className="text-gray-600">{description}</p>
+      <h2 className="text-xl font-semibold text-white mb-2">{title}</h2>
+      <p className="text-white/80 text-sm">{description}</p>
     </div>
   );
 };

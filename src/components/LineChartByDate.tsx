@@ -1,4 +1,3 @@
-// src/components/LineChartByDate.tsx
 import React from "react";
 import {
   LineChart,
@@ -55,19 +54,35 @@ const LineChartByDate: React.FC<LineChartByDateProps> = ({
 
   return (
     <div className="mt-12">
-      <h3 className="text-lg font-semibold mb-4">Evolución de gastos</h3>
+      <h3 className="text-xl font-semibold mb-6 text-white text-center">
+        Evolución de gastos
+      </h3>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
-          <XAxis dataKey="label" />
-          <YAxis />
+          <XAxis dataKey="label" stroke="#ffffff" tick={{ fill: "#ffffff" }} />
+          <YAxis stroke="#ffffff" tick={{ fill: "#ffffff" }} />
           <Tooltip
+            contentStyle={{
+              backgroundColor: "#ffffff",
+              borderRadius: "0.5rem",
+              border: "none",
+              color: "#333",
+              fontWeight: 500,
+            }}
             formatter={(value: number) => [`${value.toFixed(2)}€`, "Total"]}
           />
           <Line
             type="monotone"
             dataKey="total"
-            stroke="#8884d8"
+            stroke="#7c3aed"
             strokeWidth={3}
+            dot={{ r: 5, stroke: "white", strokeWidth: 2, fill: "#a78bfa" }}
+            activeDot={{
+              r: 7,
+              stroke: "white",
+              strokeWidth: 2,
+              fill: "#7c3aed",
+            }}
           />
         </LineChart>
       </ResponsiveContainer>
