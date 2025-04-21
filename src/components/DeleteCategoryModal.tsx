@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { deleteCategory } from "../services/categoryService";
 import { Category } from "../models/Category";
@@ -19,38 +20,39 @@ const DeleteCategoryModal: React.FC<Props> = ({ category, onClose }) => {
     onClose();
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+      className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"
+        className="bg-gray-900/70 backdrop-blur-md p-6 rounded-2xl shadow-2xl w-full max-w-sm text-white border border-white/30 ring-1 ring-white/30"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-lg font-bold mb-4 text-gray-800">
+        <h2 className="text-xl font-bold mb-4 text-center">
           ¿Eliminar categoría?
         </h2>
-        <p className="mb-6 text-sm text-gray-600">
+        <p className="mb-6 text-sm text-white/80 text-center">
           Estás a punto de eliminar <strong>{category.name}</strong>. Esta
           acción no se puede deshacer.
         </p>
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm cursor-pointer"
+            className="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition text-white cursor-pointer"
           >
             Cancelar
           </button>
           <button
             onClick={handleDelete}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm cursor-pointer"
+            className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 transition text-white shadow cursor-pointer"
           >
             Eliminar
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.getElementById("modal-root")!
   );
 };
 

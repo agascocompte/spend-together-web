@@ -3,3 +3,7 @@
 :root {
     font-family: 'system-ui';
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Invierte el color para hacerlo blanco */
+  }
