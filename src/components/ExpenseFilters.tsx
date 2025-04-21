@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { Listbox } from "@headlessui/react";
+import { ChevronUpDownIcon } from "@heroicons/react/20/solid";
 
 export type PeriodFilter = "day" | "week" | "month" | "year" | "custom";
 export type SortOption =
@@ -17,6 +19,22 @@ interface Props {
   }) => void;
 }
 
+const periodOptions: { value: PeriodFilter; label: string }[] = [
+  { value: "day", label: "Hoy" },
+  { value: "week", label: "Esta semana" },
+  { value: "month", label: "Este mes" },
+  { value: "year", label: "Este año" },
+  { value: "custom", label: "Personalizado" },
+];
+
+const sortOptions: { value: SortOption; label: string }[] = [
+  { value: "date_desc", label: "Fecha descendente" },
+  { value: "date_asc", label: "Fecha ascendente" },
+  { value: "category", label: "Nombre de categoría" },
+  { value: "price_asc", label: "Precio ascendente" },
+  { value: "price_desc", label: "Precio descendente" },
+];
+
 const ExpenseFilters: React.FC<Props> = ({ onFilterChange }) => {
   const [period, setPeriod] = useState<PeriodFilter>("month");
   const [startDate, setStartDate] = useState<string>("");
@@ -27,22 +45,52 @@ const ExpenseFilters: React.FC<Props> = ({ onFilterChange }) => {
     onFilterChange({ period, startDate, endDate, sortBy });
   }, [period, startDate, endDate, sortBy]);
 
+  const renderListbox = <T extends string>(
+    label: string,
+    value: T,
+    setValue: (val: T) => void,
+    options: { value: T; label: string }[]
+  ) => (
+    <div className="flex flex-col min-w-[250px]">
+      <label className="font-medium mb-1">{label}</label>
+      <Listbox value={value} onChange={setValue}>
+        <div className="relative">
+          <Listbox.Button className="w-full p-2 rounded border bg-white text-black flex justify-between items-center min-w-[250px]">
+            {options.find((opt) => opt.value === value)?.label}
+            <ChevronUpDownIcon className="w-5 h-5 ml-2 text-gray-500" />
+          </Listbox.Button>
+          <Listbox.Options
+            className="
+              absolute mt-1 w-full rounded-lg shadow-xl z-10 
+              border border-white/20 backdrop-blur-md bg-white/90
+              overflow-y-auto max-h-60 transition-all
+              text-black text-sm
+            "
+          >
+            {options.map((opt) => (
+              <Listbox.Option
+                key={opt.value}
+                value={opt.value}
+                className={({ active }) =>
+                  `px-4 py-2 cursor-pointer truncate ${
+                    active
+                      ? "bg-purple-100 text-purple-900"
+                      : "hover:bg-white/40"
+                  }`
+                }
+              >
+                {opt.label}
+              </Listbox.Option>
+            ))}
+          </Listbox.Options>
+        </div>
+      </Listbox>
+    </div>
+  );
+
   return (
     <div className="flex flex-col md:flex-row md:items-end gap-4 mb-6">
-      <div className="flex flex-col">
-        <label className="font-medium mb-1">Periodo</label>
-        <select
-          className="p-2 border rounded"
-          value={period}
-          onChange={(e) => setPeriod(e.target.value as PeriodFilter)}
-        >
-          <option value="day">Hoy</option>
-          <option value="week">Esta semana</option>
-          <option value="month">Este mes</option>
-          <option value="year">Este año</option>
-          <option value="custom">Personalizado</option>
-        </select>
-      </div>
+      {renderListbox("Periodo", period, setPeriod, periodOptions)}
 
       {period === "custom" && (
         <>
@@ -50,7 +98,7 @@ const ExpenseFilters: React.FC<Props> = ({ onFilterChange }) => {
             <label className="font-medium mb-1">Desde</label>
             <input
               type="date"
-              className="p-2 border rounded"
+              className="p-2 border rounded min-w-[250px]"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
             />
@@ -59,7 +107,7 @@ const ExpenseFilters: React.FC<Props> = ({ onFilterChange }) => {
             <label className="font-medium mb-1">Hasta</label>
             <input
               type="date"
-              className="p-2 border rounded"
+              className="p-2 border rounded min-w-[250px]"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
             />
@@ -67,20 +115,7 @@ const ExpenseFilters: React.FC<Props> = ({ onFilterChange }) => {
         </>
       )}
 
-      <div className="flex flex-col">
-        <label className="font-medium mb-1">Ordenar por</label>
-        <select
-          className="p-2 border rounded"
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as SortOption)}
-        >
-          <option value="date_desc">Fecha descendente</option>
-          <option value="date_asc">Fecha ascendente</option>
-          <option value="category">Nombre de categoría</option>
-          <option value="price_asc">Precio ascendente</option>
-          <option value="price_desc">Precio descendente</option>
-        </select>
-      </div>
+      {renderListbox("Ordenar por", sortBy, setSortBy, sortOptions)}
     </div>
   );
 };
