@@ -33,7 +33,11 @@ const LoginPage: React.FC = () => {
   return (
     <div className="h-screen flex flex-row">
       <div className="flex-2 flex flex-col items-center justify-center text-white p-8 bg-gradient-to-br from-purple-700 to-purple-500">
-        <img src="icon_white.svg" alt="Logo" className="w-96 h-96 mb-8" />
+        <img
+          src={`${import.meta.env.BASE_URL}icon_white.svg`}
+          alt="Logo"
+          className="w-96 h-96 mb-8"
+        />
         <h1 className="text-5xl font-bold mb-4">Spend Together</h1>
         <p className="text-lg">
           Organiza tus gastos con facilidad y colabora en grupo
