@@ -5,7 +5,7 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import firebaseApp from "../firebase";
 import {
   signInWithGoogle as googleSignIn,
@@ -13,19 +13,23 @@ import {
 } from "../services/authService";
 
 interface AuthContextType {
-  user: any; // Define el tipo de usuario
-  signInWithGoogle: () => Promise<void>;
+  user: User | null;
+  signInWithGoogle: () => Promise<User>;
   signOutUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  signInWithGoogle: async () => {},
-  signOutUser: async () => {},
+  signInWithGoogle: async () => {
+    throw new Error("signInWithGoogle no implementado");
+  },
+  signOutUser: async () => {
+    throw new Error("signOutUser no implementado");
+  },
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const auth = getAuth(firebaseApp);
 
   useEffect(() => {
@@ -35,9 +39,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return unsubscribe;
   }, [auth]);
 
-  const signInWithGoogle = async () => {
-    const userData = await googleSignIn();
-    setUser(userData);
+  const signInWithGoogle = async (): Promise<User> => {
+    const userCredential = await googleSignIn(); // asegúrate de que esto devuelva UserCredential
+    const currentUser = userCredential;
+    setUser(currentUser);
+    return currentUser;
   };
 
   const signOutUser = async () => {

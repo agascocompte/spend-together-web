@@ -1,15 +1,29 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useHousehold } from "../context/HouseholdContext";
+import HouseholdPromptModal from "../components/HouseholdPromptModal";
 
 const LoginPage: React.FC = () => {
   const { signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const { fetchHousehold } = useHousehold();
+  const [showModal, setShowModal] = useState(false);
+  const uidRef = useRef<string | null>(null); // 👈 guardamos uid temporalmente
 
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithGoogle();
-      navigate("/home");
+      const user = await signInWithGoogle();
+      const uid = user.uid;
+
+      uidRef.current = uid;
+      const foundHouseholdId = await fetchHousehold(uid); // ahora retorna string | null
+
+      if (!foundHouseholdId) {
+        setShowModal(true);
+      } else {
+        navigate("/home");
+      }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       alert("Error al iniciar sesión: " + error);
@@ -47,7 +61,8 @@ const LoginPage: React.FC = () => {
                 pr-2
                 font-medium
                 transition-all duration-200
-                hover:border-3 hover:border-blue-300/50 hover:bg-blue-500/95"
+                hover:border-3 hover:border-blue-300/50 hover:bg-blue-500/95
+                cursor-pointer"
           >
             <img
               className="w-10 h-10 mr-2 bg-white rounded"
@@ -60,6 +75,17 @@ const LoginPage: React.FC = () => {
           </button>
         </div>
       </div>
+      {showModal && uidRef.current && (
+        <HouseholdPromptModal
+          userId={uidRef.current}
+          onClose={(shouldNavigate) => {
+            setShowModal(false);
+            if (shouldNavigate) {
+              navigate("/home");
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
