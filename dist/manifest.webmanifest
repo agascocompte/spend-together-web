@@ -1,0 +1,9 @@
+{
+  "name": "Spend Together",
+  "short_name": "SpendTogether",
+  "start_url": "/spend-together-web/",
+  "scope": "/spend-together-web/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
+}
