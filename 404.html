@@ -1,7 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="refresh" content="0; url=/spend-together-web/" />
+    <meta charset="utf-8">
+    <script>
+      // Ruta completa que el usuario intentaba abrir
+      const fullPath = window.location.pathname + window.location.search;
+
+      // Eliminamos el prefijo del repositorio (/spend-together-web)
+      const relative = fullPath.replace('/spend-together-web', '');
+
+      // Redirigimos a index enviando la ruta original
+      window.location.replace('/spend-together-web/?redirect=' + encodeURIComponent(relative));
+    </script>
   </head>
   <body></body>
 </html>
