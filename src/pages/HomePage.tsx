@@ -48,17 +48,25 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-700 to-purple-500 text-white">
-      <header className="flex items-center justify-between p-6 bg-transparent">
-        <h1 className="text-2xl font-bold">SpendTogether</h1>
-        <div className="flex items-center space-x-4">
-          <p className="text-sm text-gray-200">{user?.email}</p>
-          <button
-            className="bg-purple-500 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
+      <header className="p-6 bg-transparent flex flex-col md:flex-row md:items-center md:justify-between">
+        {/* Título */}
+        <div className="flex flex-col">
+          <h1 className="text-2xl font-bold">SpendTogether</h1>
+          <p className="text-sm text-gray-200 break-all">{user?.email}</p>
         </div>
+
+        {/* Botón Logout */}
+        <button
+          className="
+      bg-purple-500 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer
+      mt-4
+      md:mt-0 md:ml-4 md:order-none
+      order-last
+    "
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
       </header>
 
       {householdId ? (
